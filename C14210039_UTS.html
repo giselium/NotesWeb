@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>UTS TekWeb</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="fa_icons/css/all.css"> 
+</head>
+<body style="background-color:rgb(223, 218, 148);">
+    <nav class="navbar navbar-expand-sm navbar-dark">
+        <h2 class="navbar-brand text-dark" style="margin-top: 10px; font-size: 150%;">MY NOTES</h2>  
+    </nav>
+
+    <button type="button" class="btn btn-secondary" style="margin: 20px;" data-toggle="modal" data-target="#addNotes">Add Note</button>
+    
+    
+    <!-- Modal Add Notes -->
+    <div class="modal fade" id="addNotes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <nav class="navbar navbar-expand-sm bg-secondary navbar-dark">
+                <h2 class="navbar-brand" style="margin-top: 10px; font-size: 150%;">Add Notes</h2>
+                <button type="button" class="close" data-dismiss="modal" style="margin-left: 310px;">&times;</button>
+            </nav>
+            <div class="modal-body">
+              <form action="/action_page.php">
+                <div class="mb-3">
+                  <label for="recipient-name" class="col-form-label"><b>Title</b></label>
+                  <input type="text" class="form-control" id="noteTitle" placeholder="Notes Title">
+                </div>
+                <div class="mb-3">
+                  <label for="message-text" class="col-form-label"><b>Notes</b></label>
+                  <textarea class="form-control" id="noteText" placeholder="Text Notes" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label><b>Color</b></label>
+                    <select id="color" class="form-control">
+                        <option value="Yellow">Yellow</option>
+                        <option value="Green">Green</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Red">Red</option>
+                        <option value="White">White</option>
+                    </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" data-dismiss="modal" class="btn btn-secondary" id="Add">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Modal Edit Notes -->
+    <div class="modal fade" id="editNotes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <nav class="navbar navbar-expand-sm bg-secondary navbar-dark">
+                <h2 class="navbar-brand" style="margin-top: 10px; font-size: 150%;">Edit Notes</h2>
+                <button type="button" class="close" data-dismiss="modal" style="margin-left: 310px;">&times;</button>
+            </nav>
+            <div class="modal-body">
+              <form action="/action_page.php">
+                <div class="mb-3">
+                  <label for="recipient-name" class="col-form-label"><b>Title</b></label>
+                  <input type="text" class="form-control" id="editTitle" placeholder="Notes Title">
+                </div>
+                <div class="mb-3">
+                  <label for="message-text" class="col-form-label"><b>Notes</b></label>
+                  <textarea class="form-control" id="editText" placeholder="Text Notes" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label><b>Color</b></label>
+                    <select id="editColor" class="form-control">
+                        <option value="Yellow">Yellow</option>
+                        <option value="Green">Green</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Red">Red</option>
+                        <option value="White">White</option>
+                    </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" data-dismiss="modal" class="btn btn-secondary" id="Edit">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    <div id="print">
+    </div>
+
+
+    <script>
+        var array = [];
+        var edit = 0;
+        var counter = 0; 
+
+        $(function() {
+           $('#Add').click(function() {
+                var title = $('#noteTitle').val();
+                var text = $('#noteText').val();
+                var color = $('#color').val();
+                array[counter] = {};
+                array[counter].title = title;
+                array[counter].text = text;
+                array[counter].color = color;
+                counter++;
+                $('#noteTitle').val('');
+                $('#noteText').val('');
+                printNotes();
+           });
+
+           $('#Edit').click(function() {
+                var title = $('#editTitle').val();
+                var text = $('#editText').val();
+                var color = $('#editColor').val();
+                array[edit].title = title;
+                array[edit].text = text;
+                array[edit].color = color;
+                printNotes();
+           });
+        });
+
+        function Edit(index) {
+            $('#editTitle').val(array[index].title);
+            $('#editText').val(array[index].text);
+            $('#editColor').val(array[index].color)
+            edit = index;
+        }
+
+        function Delete(index) {
+            array[index] = array[index+1];
+            counter -= 1;
+            printNotes();
+        }
+
+        function printNotes() {
+            var strResult = '<div class="container-fluid"><div class="row">';
+            for (var i=0; i<counter; i++) {
+                if(array[i].color == "Yellow"){
+                    strResult += '<div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 20px"><div class="card bg-warning"><div class="card-head">' +
+                        '<div style="text-align: right;"><i style="font-size:20px; margin: 20px" class="fas fa-times" onclick="Delete(' + i + ')"></i></div></div>' +
+                        '<div class="card-body" onclick="Edit(' + i +')" data-toggle="modal" data-target="#editNotes">' +
+                        '<h3>' + array[i].title + '</h3><p>' + array[i].text + '</p></div></div></div>';
+                }
+                else if(array[i].color == "Green"){
+                    strResult += '<div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 20px"><div class="card bg-success"><div class="card-head">' +
+                        '<div style="text-align: right;"><i style="font-size:20px; margin: 20px" class="fas fa-times" onclick="Delete(' + i + ')"></i></div></div>' +
+                        '<div class="card-body" onclick="Edit(' + i +')" data-toggle="modal" data-target="#editNotes">' +
+                        '<h3>' + array[i].title + '</h3><p>' + array[i].text + '</p></div></div></div>';
+                }
+                else if(array[i].color == "Blue"){
+                    strResult += '<div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 20px"><div class="card bg-primary"><div class="card-head">' +
+                        '<div style="text-align: right;"><i style="font-size:20px; margin: 20px" class="fas fa-times" onclick="Delete(' + i + ')"></i></div></div>' +
+                        '<div class="card-body" onclick="Edit(' + i +')" data-toggle="modal" data-target="#editNotes">' +
+                        '<h3>' + array[i].title + '</h3><p>' + array[i].text + '</p></div></div></div>';
+                }
+                else if(array[i].color == "Red"){
+                    strResult += '<div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 20px"><div class="card bg-danger"><div class="card-head">' +
+                        '<div style="text-align: right;"><i style="font-size:20px; margin: 20px" class="fas fa-times" onclick="Delete(' + i + ')"></i></div></div>' +
+                        '<div class="card-body" onclick="Edit(' + i +')" data-toggle="modal" data-target="#editNotes">' +
+                        '<h3>' + array[i].title + '</h3><p>' + array[i].text + '</p></div></div></div>';
+                }
+                else if(array[i].color == "White"){
+                    strResult += '<div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 20px"><div class="card"><div class="card-head">' +
+                        '<div style="text-align: right;"><i style="font-size:20px; margin: 20px" class="fas fa-times" onclick="Delete(' + i + ')"></i></div></div>' +
+                        '<div class="card-body" onclick="Edit(' + i +')" data-toggle="modal" data-target="#editNotes">' +
+                        '<h3>' + array[i].title + '</h3><p>' + array[i].text + '</p></div></div></div>';
+                }
+                };
+                
+                strResult += '</div></div>';
+            
+            $('#print').html(strResult);
+        };
+
+    </script>
+</body>
+</html>
